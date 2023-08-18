@@ -27,6 +27,10 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn clean install archetype:generate -DarchetypeGroupId="com.codingchica.maven.archetypes" -DarchetypeArtifactId="java-quickstart-archetype" -DarchetypeVersion="0.1-SNAPSHOT" -DgroupId="testgroup" -DartifactId="testartifact" -Dversion="0.1-SNAPSHOT" -DoutputDirectory=target/testartifact --batch-mode && mvn clean install -DbaseDir="target/testartifact"
+    - name: Build archetype with Maven
+      run: mvn clean install
+    - name: Generate sample project
+      run: mvn archetype:generate -DarchetypeGroupId="com.codingchica.maven.archetypes" -DarchetypeArtifactId="java-quickstart-archetype" -DarchetypeVersion="0.1-SNAPSHOT" -DgroupId="testgroup" -DartifactId="testartifact" -Dversion="0.1-SNAPSHOT" -DoutputDirectory=target/testartifact --batch-mode
+    - name: Build sample project
+      run: mvn clean install -DbaseDir="target/testartifact"
 
