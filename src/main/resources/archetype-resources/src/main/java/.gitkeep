@@ -1,0 +1,1 @@
+Git does not store empty folders, so this hidden file is a way to include the folder in the git repo, if committed.

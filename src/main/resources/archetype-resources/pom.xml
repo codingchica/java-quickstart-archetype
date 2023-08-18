@@ -1,0 +1,297 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+    <packaging>jar</packaging>
+
+    <name>${artifactId}</name>
+
+
+    <properties>
+        <!--
+        argLine will be extended by jacoco-maven-plugin.
+        Additional argLine values for maven-surefire-plugin can be set here.
+        -->
+        <argLine/>
+        <jacoco.maven.plugin.version>0.8.10</jacoco.maven.plugin.version>
+        <java.version>17</java.version>
+        <junit.jupiter.version>5.9.2</junit.jupiter.version>
+        <lombok.version>1.18.28</lombok.version>
+        <maven.clean.plugin.version>3.1.0</maven.clean.plugin.version>
+        <maven.checkstyle.plugin.version>3.3.0</maven.checkstyle.plugin.version>
+        <maven.compiler.plugin.version>3.8.0</maven.compiler.plugin.version>
+        <maven.deploy.plugin.version>2.8.2</maven.deploy.plugin.version>
+        <maven.javadoc.plugin.version>3.5.0</maven.javadoc.plugin.version>
+        <maven.jar.plugin.version>3.0.2</maven.jar.plugin.version>
+        <maven.install.plugin.version>3.1.1</maven.install.plugin.version>
+        <maven.project.info.reports.plugin.version>3.0.0</maven.project.info.reports.plugin.version>
+        <maven.resources.plugin.version>3.0.2</maven.resources.plugin.version>
+        <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
+        <maven.surefire.plugin.version>3.1.2</maven.surefire.plugin.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spotless.maven.plugin.version>2.35.0</spotless.maven.plugin.version>
+    </properties>
+
+    <dependencies>
+        <!-- Provided Dependencies -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+
+
+            <plugin>
+                <!-- clean lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#clean_Lifecycle -->
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven.clean.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <!-- default lifecycle, jar packaging: see https://maven.apache.org/ref/current/maven-core/default-bindings.html#Plugin_bindings_for_jar_packaging -->
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven.resources.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.plugin.version}</version>
+                <configuration>
+                    <!-- argLine will be set by jacoco-maven-plugin -->
+                    <argLine>${argLine}</argLine>
+                    <parallel>all</parallel>
+                    <runOrder>random</runOrder>
+                </configuration>
+            </plugin>
+            <plugin>
+                <!--
+                https://www.eclemma.org/jacoco/trunk/doc/maven.html
+                https://www.eclemma.org/jacoco/trunk/doc/integrations.html
+                -->
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.maven.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>prepare-ut</id>
+                        <goals>
+                            <!-- binds by default to the 'initialize' Maven lifecycle phase -->
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report-ut</id>
+                        <goals>
+                            <!-- binds by default to the 'verify' Maven lifecycle phase -->
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/ut-code-coverage</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>check-ut</id>
+                        <goals>
+                            <!-- binds by default to the 'verify' Maven lifecycle phase -->
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <!-- Build breaker rules to enforce in order to get a successful build -->
+                                <rule>
+                                    <!-- In each declared class. -->
+                                    <element>CLASS</element>
+                                    <limits>
+                                        <limit>
+                                            <!-- Individual instruction / command count (isn't impacted by formatting / line wrapping). -->
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                        <limit>
+                                            <!-- Branches of logic are things like individual true/false tests in an if / else / switch statement.  -->
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>${maven.install.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>${maven.deploy.plugin.version}</version>
+            </plugin>
+            <!-- site lifecycle, see https://maven.apache.org/ref/current/maven-core/lifecycles.html#site_Lifecycle -->
+            <plugin>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven.site.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven.project.info.reports.plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>${maven.checkstyle.plugin.version}</version>
+                <configuration>
+                    <!-- use google configuration for now - to match the spotless maven plugin expectations.
+                       TODO - Create our own configuration file and reference here
+                    -->
+                    <configLocation>google_checks.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/ -->
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven.javadoc.plugin.version}</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <failOnError>true</failOnError>
+                    <failOnWarnings>true</failOnWarnings>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <!-- https://github.com/diffplug/spotless/tree/main/plugin-maven -->
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.maven.plugin.version}</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <markdown>
+                        <includes>
+                            <!-- You have to set the target manually -->
+                            <include>**/*.md</include>
+                        </includes>
+                        <flexmark/>
+                    </markdown>
+                    <java>
+                        <!-- Cleanthat will refactor your code, but it may break your style: apply it before your formatter -->
+                        <cleanthat/>
+
+                        <googleJavaFormat>
+                            <!-- GOOGLE or AOSP (optional) -->
+                            <!-- https://github.com/google/google-java-format -->
+                            <style>GOOGLE</style>
+                            <!-- optional (requires at least 1.8) -->
+                            <reflowLongStrings>true</reflowLongStrings>
+                        </googleJavaFormat>
+
+                        <!-- standard import order -->
+                        <importOrder/>
+
+                        <!-- Removing unused imports at the top of each file. -->
+                        <removeUnusedImports/>
+
+                        <!-- Fixes formatting of type annotations that may have occurred earlier in the formatting process. -->
+                        <formatAnnotations/>
+                    </java>
+                    <pom>
+                        <!-- These are the defaults, you can override if you want -->
+                        <includes>
+                            <include>pom.xml</include>
+                        </includes>
+
+                        <sortPom>
+                            <!-- The encoding of the pom files -->
+                            <encoding>UTF-8</encoding>
+                            <!-- Should empty elements be expanded-->
+                            <expandEmptyElements>false</expandEmptyElements>
+                            <!-- Should a space be added inside self-closing elements-->
+                            <spaceBeforeCloseEmptyElement>false</spaceBeforeCloseEmptyElement>
+                            <!-- Keep empty lines -->
+                            <keepBlankLines>true</keepBlankLines>
+                            <!-- Indentation -->
+                            <nrOfIndentSpace>4</nrOfIndentSpace>
+                            <!-- Should empty lines be indented -->
+                            <indentBlankLines>false</indentBlankLines>
+                            <!-- Should schema locations be indented -->
+                            <indentSchemaLocation>true</indentSchemaLocation>
+                            <!--
+                            Sort order of elements: https://github.com/Ekryd/sortpom/wiki/PredefinedSortOrderProfiles
+                            recommended_2008_06 - The POM Code Convention that was chosen by Maven developers in 2008 (default for 3.0.0+)
+                            -->
+                            <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+                            <!-- Sort dependency exclusions: https://github.com/Ekryd/sortpom/wiki/SortDependencies-->
+                            <sortDependencyExclusions/>
+                            <!-- Sort properties -->
+                            <sortProperties>true</sortProperties>
+                            <!-- Sort plugin executions -->
+                            <sortExecutions>false</sortExecutions>
+                        </sortPom>
+                    </pom>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>auto-style</id>
+                        <goals>
+                            <goal>apply</goal>
+                        </goals>
+                        <!-- Using validate phase, so this happens before enforce-style -->
+                        <phase>validate</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
