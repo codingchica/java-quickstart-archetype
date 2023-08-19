@@ -1,4 +1,6 @@
 # Java Quickstart Archetype
+[![Java CI with Maven](https://github.com/codingchica/java-quickstart-archetype/actions/workflows/maven.yml/badge.svg)](https://github.com/codingchica/java-quickstart-archetype/actions/workflows/maven.yml)
+
 This project is a Maven archetype to generate a new Maven-based Java project.  
 
 ## Testing Locally
